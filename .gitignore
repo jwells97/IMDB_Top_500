@@ -1,0 +1,16 @@
+# Virtual environment
+.venv/
+venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Secrets (never commit API keys or Kaggle credentials)
+.env
+kaggle.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/

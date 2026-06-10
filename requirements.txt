@@ -1,0 +1,4 @@
+kagglehub[pandas-datasets]
+matplotlib
+seaborn
+adjustText

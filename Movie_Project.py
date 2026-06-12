@@ -176,3 +176,76 @@ plt.show()
 print("Saved charts:")
 print("- critics_vs_audience.png")
 print("- genre_scores.png")
+
+# 6. Average score by language
+language_scores = (
+    df.groupby("Language")["Custom_Score"]
+    .agg(["mean", "count"])
+    .rename(columns={"mean": "avg_score", "count": "movie_count"})
+    .query("movie_count >= 3")
+    .sort_values("avg_score", ascending=True)
+)
+
+plt.figure(figsize=(10, 6))
+sns.barplot(
+    x=language_scores["avg_score"],
+    y=language_scores.index,
+    color="steelblue",
+)
+plt.title("Average Custom Score by Language (3+ movies)")
+plt.xlabel("Average Custom Score")
+plt.ylabel("Language")
+plt.tight_layout()
+plt.savefig("language_scores.png", dpi=150)
+plt.show()
+
+# 7. Average score by streaming platform (split multi-platform labels)
+streaming_df = (
+    df.dropna(subset=["Streaming_On"])
+    .assign(Platform=lambda d: d["Streaming_On"].str.split(", "))
+    .explode("Platform")
+    .assign(Platform=lambda d: d["Platform"].str.strip())
+)
+platform_scores = (
+    streaming_df.groupby("Platform")["Custom_Score"]
+    .agg(["mean", "count"])
+    .rename(columns={"mean": "avg_score", "count": "movie_count"})
+    .query("movie_count >= 5")
+    .sort_values("avg_score", ascending=True)
+)
+
+plt.figure(figsize=(10, 6))
+sns.barplot(
+    x=platform_scores["avg_score"],
+    y=platform_scores.index,
+    color="steelblue",
+)
+plt.title("Average Custom Score by Streaming Platform (5+ movies)")
+plt.xlabel("Average Custom Score")
+plt.ylabel("Platform")
+plt.tight_layout()
+plt.savefig("streaming_scores.png", dpi=150)
+plt.show()
+
+# 8. Average score: movies with awards vs. without
+df["Has_Awards"] = df["Awards"].notna()
+awards_scores = df.groupby("Has_Awards")["Custom_Score"].mean()
+awards_labels = ["No Awards Listed", "Awards Listed"]
+
+plt.figure(figsize=(8, 5))
+sns.barplot(
+    x=awards_labels,
+    y=awards_scores.values,
+    color="steelblue",
+)
+plt.title("Average Custom Score: Awards vs. No Awards")
+plt.xlabel("")
+plt.ylabel("Average Custom Score")
+plt.tight_layout()
+plt.savefig("awards_scores.png", dpi=150)
+plt.show()
+
+print("Saved charts:")
+print("- language_scores.png")
+print("- streaming_scores.png")
+print("- awards_scores.png")
